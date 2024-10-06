@@ -23,5 +23,5 @@ public class Estacionamento {
     private String placaVeiculo;
     private LocalDateTime horaEntrada;
     private LocalDateTime horaSaida;
-    private Double valorPago;
+    private Double valorAPagar;
 }

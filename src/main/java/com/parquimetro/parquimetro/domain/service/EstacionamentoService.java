@@ -21,11 +21,7 @@ public class EstacionamentoService {
 
     @Transactional
     public Estacionamento registrarEntrada(String placaVeiculo) {
-
-        if (estacionamentoRepository.findByHoraSaidaIsNull().stream()
-                .anyMatch(e -> e.getPlacaVeiculo().equals(placaVeiculo))) {
-            throw new IllegalStateException("Veículo já está no estacionamento");
-        }
+        verificaSeVeiculoJaEntrou(placaVeiculo);
 
         Estacionamento estacionamento = new Estacionamento();
         estacionamento.setPlacaVeiculo(placaVeiculo);
@@ -33,16 +29,32 @@ public class EstacionamentoService {
         return estacionamentoRepository.save(estacionamento);
     }
 
+    private void verificaSeVeiculoJaEntrou(String placaVeiculo){
+        if (estacionamentoRepository.findByHoraSaidaIsNull().stream()
+                .anyMatch(e -> e.getPlacaVeiculo().equals(placaVeiculo))) {
+            throw new IllegalStateException("ERR001: Veiculo com placa " + placaVeiculo + " ja esta no estacionamento");
+        }
+    }
+
     @Transactional
     public Optional<Estacionamento> registrarSaida(UUID id) {
+        verificaSeVeiculoJaSaiu(id);
         Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.findById(id);
 
         return estacionamentoOpt.map(estacionamento -> {
             estacionamento.setHoraSaida(LocalDateTime.now());
-            estacionamento.setValorPago(calcularValor(estacionamento.getHoraEntrada(), estacionamento.getHoraSaida()));
+            estacionamento.setValorAPagar(calcularValor(estacionamento.getHoraEntrada(), estacionamento.getHoraSaida()));
             estacionamentoRepository.save(estacionamento);
             return estacionamento;
         });
+    }
+
+    private void verificaSeVeiculoJaSaiu(UUID id){
+        Optional<Estacionamento> carro = estacionamentoRepository.findById(id);
+
+        if (carro.isPresent() && carro.get().getHoraSaida() != null) {
+            throw new IllegalStateException("ERR002: Veiculo com id " + id + " ja saiu do estacionamento");
+        }
     }
 
     private double calcularValor(LocalDateTime horaEntrada, LocalDateTime horaSaida) {

@@ -17,21 +17,26 @@ public class EstacionamentoController {
     private EstacionamentoService estacionamentoService;
 
     @PostMapping("/entrada")
-    public ResponseEntity<Estacionamento> registrarEntrada(@RequestParam String placaVeiculo) {
+    public ResponseEntity<?> registrarEntrada(@RequestParam String placaVeiculo) {
         try {
             Estacionamento estacionamento = estacionamentoService.registrarEntrada(placaVeiculo);
             return ResponseEntity.ok(estacionamento);
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/saida/{id}")
-    public ResponseEntity<Estacionamento> registrarSaida(@PathVariable UUID id) {
-        Optional<Estacionamento> estacionamentoOpt = estacionamentoService.registrarSaida(id);
+    public ResponseEntity<?> registrarSaida(@PathVariable UUID id) {
+        try{
+            Optional<Estacionamento> estacionamentoOpt = estacionamentoService.registrarSaida(id);
 
-        return estacionamentoOpt.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+            return estacionamentoOpt.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        }catch (IllegalStateException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
     @GetMapping("/ticket/{id}")
@@ -59,7 +64,7 @@ public class EstacionamentoController {
                 estacionamento.getPlacaVeiculo(),
                 estacionamento.getHoraEntrada(),
                 estacionamento.getHoraSaida(),
-                estacionamento.getValorPago());
+                estacionamento.getValorAPagar());
     }
 }
 
