@@ -21,7 +21,7 @@ public class EstacionamentoService {
 
     @Transactional
     public Estacionamento registrarEntrada(String placaVeiculo) {
-        verificaSeVeiculoJaEntrou(placaVeiculo);
+        verificarSeVeiculoJaEntrou(placaVeiculo);
 
         Estacionamento estacionamento = new Estacionamento();
         estacionamento.setPlacaVeiculo(placaVeiculo);
@@ -29,7 +29,7 @@ public class EstacionamentoService {
         return estacionamentoRepository.save(estacionamento);
     }
 
-    private void verificaSeVeiculoJaEntrou(String placaVeiculo){
+    private void verificarSeVeiculoJaEntrou(String placaVeiculo){
         if (estacionamentoRepository.findByHoraSaidaIsNull().stream()
                 .anyMatch(e -> e.getPlacaVeiculo().equals(placaVeiculo))) {
             throw new IllegalStateException("ERR001: Veiculo com placa " + placaVeiculo + " ja esta no estacionamento");
@@ -37,25 +37,26 @@ public class EstacionamentoService {
     }
 
     @Transactional
-    public Optional<Estacionamento> registrarSaida(UUID id) {
-        verificaSeVeiculoJaSaiu(id);
-        Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.findById(id);
+    public Estacionamento registrarSaida(UUID id) {
+        Estacionamento estacionamento = estacionamentoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("ERR001: Veículo com id " + id + " não encontrado"));
 
-        return estacionamentoOpt.map(estacionamento -> {
-            estacionamento.setHoraSaida(LocalDateTime.now());
-            estacionamento.setValorAPagar(calcularValor(estacionamento.getHoraEntrada(), estacionamento.getHoraSaida()));
-            estacionamentoRepository.save(estacionamento);
-            return estacionamento;
-        });
+        verificarSeVeiculoJaSaiu(id);
+
+        estacionamento.setHoraSaida(LocalDateTime.now());
+        estacionamento.setValorAPagar(calcularValor(estacionamento.getHoraEntrada(), estacionamento.getHoraSaida()));
+
+        return estacionamentoRepository.save(estacionamento);
     }
 
-    private void verificaSeVeiculoJaSaiu(UUID id){
-        Optional<Estacionamento> carro = estacionamentoRepository.findById(id);
-
-        if (carro.isPresent() && carro.get().getHoraSaida() != null) {
-            throw new IllegalStateException("ERR002: Veiculo com id " + id + " ja saiu do estacionamento");
-        }
+    private void verificarSeVeiculoJaSaiu(UUID id) {
+        estacionamentoRepository.findById(id)
+                .filter(veiculo -> veiculo.getHoraSaida() != null)
+                .ifPresent(veiculo -> {
+                    throw new IllegalStateException("ERR002: Veículo com id " + id + " já saiu do estacionamento");
+                });
     }
+
 
     private double calcularValor(LocalDateTime horaEntrada, LocalDateTime horaSaida) {
         long horas = Duration.between(horaEntrada, horaSaida).toHours();

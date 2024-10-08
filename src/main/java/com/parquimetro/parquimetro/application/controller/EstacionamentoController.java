@@ -2,7 +2,9 @@ package com.parquimetro.parquimetro.application.controller;
 
 import com.parquimetro.parquimetro.domain.entity.Estacionamento;
 import com.parquimetro.parquimetro.domain.service.EstacionamentoService;
+import com.parquimetro.parquimetro.infra.repository.EstacionamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,9 @@ public class EstacionamentoController {
     @Autowired
     private EstacionamentoService estacionamentoService;
 
+    @Autowired
+    private EstacionamentoRepository estacionamentoRepository;
+
     @PostMapping("/entrada")
     public ResponseEntity<?> registrarEntrada(@RequestParam String placaVeiculo) {
         try {
@@ -28,27 +33,31 @@ public class EstacionamentoController {
 
     @PutMapping("/saida/{id}")
     public ResponseEntity<?> registrarSaida(@PathVariable UUID id) {
-        try{
-            Optional<Estacionamento> estacionamentoOpt = estacionamentoService.registrarSaida(id);
-
-            return estacionamentoOpt.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
-        }catch (IllegalStateException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+        try {
+            Estacionamento estacionamento = estacionamentoService.registrarSaida(id);
+            return ResponseEntity.ok(estacionamento);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // Retorna 404 com a mensagem
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); // Retorna 400 com a mensagem
         }
-
     }
 
     @GetMapping("/ticket/{id}")
     public ResponseEntity<String> gerarTicket(@PathVariable UUID id) {
-        Optional<Estacionamento> estacionamentoOpt = estacionamentoService.registrarSaida(id);
+        Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.findById(id);
 
         if (estacionamentoOpt.isPresent()) {
             Estacionamento est = estacionamentoOpt.get();
-            String ticket = criarTicket(est);
-            return ResponseEntity.ok(ticket);
+
+            if (est.getHoraSaida() != null) {
+                String ticket = criarTicket(est);
+                return ResponseEntity.ok(ticket);
+            } else {
+                return ResponseEntity.badRequest().body("A saída ainda não foi registrada para o veículo com id " + id);
+            }
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).body("Veículo com id " + id + " não encontrado.");
         }
     }
 

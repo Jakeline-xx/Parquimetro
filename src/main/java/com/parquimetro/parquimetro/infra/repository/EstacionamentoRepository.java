@@ -15,7 +15,5 @@ public interface EstacionamentoRepository extends JpaRepository<Estacionamento, 
 
     Optional<Estacionamento> findById(UUID id);
 
-    //verificar se hora saide é nulo para respectivo id
-
 }
 
