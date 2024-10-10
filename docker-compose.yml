@@ -1,0 +1,17 @@
+version: '3'
+services:
+  parquimetro:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:psinote
+      - SPRING_DATASOURCE_USERNAME=bd
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - parquimetro-net
+
+networks:
+  parquimetro-net:
+    driver: bridge

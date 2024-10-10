@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Estacionamento {
+public class Parquimetro {
 
     @Id
     @GeneratedValue

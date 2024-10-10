@@ -1,8 +1,8 @@
 package com.parquimetro.parquimetro.application.controller;
 
-import com.parquimetro.parquimetro.domain.entity.Estacionamento;
-import com.parquimetro.parquimetro.domain.service.EstacionamentoService;
-import com.parquimetro.parquimetro.infra.repository.EstacionamentoRepository;
+import com.parquimetro.parquimetro.domain.entity.Parquimetro;
+import com.parquimetro.parquimetro.domain.service.ParquimetroService;
+import com.parquimetro.parquimetro.infra.repository.ParquimetroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +13,22 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/parquimetro")
-public class EstacionamentoController {
+public class ParquimetroController {
+
+    private final ParquimetroService parquimetroService;
+    private final ParquimetroRepository parquimetroRepository;
 
     @Autowired
-    private EstacionamentoService estacionamentoService;
-
-    @Autowired
-    private EstacionamentoRepository estacionamentoRepository;
+    public ParquimetroController(ParquimetroRepository parquimetroRepository, ParquimetroService parquimetroService) {
+        this.parquimetroRepository = parquimetroRepository;
+        this.parquimetroService = parquimetroService;
+    }
 
     @PostMapping("/entrada")
     public ResponseEntity<?> registrarEntrada(@RequestParam String placaVeiculo) {
         try {
-            Estacionamento estacionamento = estacionamentoService.registrarEntrada(placaVeiculo);
-            return ResponseEntity.ok(estacionamento);
+            Parquimetro parquimetro = parquimetroService.registrarEntrada(placaVeiculo);
+            return ResponseEntity.ok(parquimetro);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -34,8 +37,8 @@ public class EstacionamentoController {
     @PutMapping("/saida/{id}")
     public ResponseEntity<?> registrarSaida(@PathVariable UUID id) {
         try {
-            Estacionamento estacionamento = estacionamentoService.registrarSaida(id);
-            return ResponseEntity.ok(estacionamento);
+            Parquimetro parquimetro = parquimetroService.registrarSaida(id);
+            return ResponseEntity.ok(parquimetro);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()); // Retorna 404 com a mensagem
         } catch (IllegalStateException e) {
@@ -45,10 +48,10 @@ public class EstacionamentoController {
 
     @GetMapping("/ticket/{id}")
     public ResponseEntity<String> gerarTicket(@PathVariable UUID id) {
-        Optional<Estacionamento> estacionamentoOpt = estacionamentoRepository.findById(id);
+        Optional<Parquimetro> parquimetroOpt = parquimetroRepository.findById(id);
 
-        if (estacionamentoOpt.isPresent()) {
-            Estacionamento est = estacionamentoOpt.get();
+        if (parquimetroOpt.isPresent()) {
+            Parquimetro est = parquimetroOpt.get();
 
             if (est.getHoraSaida() != null) {
                 String ticket = criarTicket(est);
@@ -61,19 +64,19 @@ public class EstacionamentoController {
         }
     }
 
-    private String criarTicket(Estacionamento estacionamento) {
+    private String criarTicket(Parquimetro parquimetro) {
         return String.format("""
-            ********** TICKET DE ESTACIONAMENTO **********
+            ---------- COMPROVANTE DE ESTACIONAMENTO ----------
             Placa do Veículo: %s
             Hora de Entrada: %s
             Hora de Saída: %s
             Valor Total: R$ %.2f
-            ********************************************
+            --------------------------------------------
             """,
-                estacionamento.getPlacaVeiculo(),
-                estacionamento.getHoraEntrada(),
-                estacionamento.getHoraSaida(),
-                estacionamento.getValorAPagar());
+                parquimetro.getPlacaVeiculo(),
+                parquimetro.getHoraEntrada(),
+                parquimetro.getHoraSaida(),
+                parquimetro.getValorAPagar());
     }
 }
 

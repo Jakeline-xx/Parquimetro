@@ -1,6 +1,6 @@
 package com.parquimetro.parquimetro.infra.repository;
 
-import com.parquimetro.parquimetro.domain.entity.Estacionamento;
+import com.parquimetro.parquimetro.domain.entity.Parquimetro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface EstacionamentoRepository extends JpaRepository<Estacionamento, Long> {
+public interface ParquimetroRepository extends JpaRepository<Parquimetro, Long> {
 
-    List<Estacionamento> findByHoraSaidaIsNull();
+    List<Parquimetro> findByHoraSaidaIsNull();
 
-    Optional<Estacionamento> findById(UUID id);
+    Optional<Parquimetro> findById(UUID id);
 
 }
 
