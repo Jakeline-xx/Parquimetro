@@ -5,10 +5,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:h2:mem:psinote
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:parquimetro
       - SPRING_DATASOURCE_USERNAME=bd
       - SPRING_DATASOURCE_PASSWORD=password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_H2_CONSOLE_SETTINGS_WEB_ALLOW_OTHERS=true
     networks:
       - parquimetro-net
 
