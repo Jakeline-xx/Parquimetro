@@ -1,7 +1,7 @@
-package com.parquimetro.parquimetro.domain.service;
+package com.parquimetro.domain.service;
 
-import com.parquimetro.parquimetro.domain.entity.Parquimetro;
-import com.parquimetro.parquimetro.infra.repository.ParquimetroRepository;
+import com.parquimetro.infra.repository.ParquimetroRepository;
+import com.parquimetro.domain.entity.Parquimetro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

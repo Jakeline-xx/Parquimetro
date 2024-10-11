@@ -1,6 +1,6 @@
-package com.parquimetro.parquimetro.infra.repository;
+package com.parquimetro.infra.repository;
 
-import com.parquimetro.parquimetro.domain.entity.Parquimetro;
+import com.parquimetro.domain.entity.Parquimetro;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

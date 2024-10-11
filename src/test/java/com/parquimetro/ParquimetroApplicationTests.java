@@ -1,4 +1,4 @@
-package com.parquimetro.parquimetro;
+package com.parquimetro;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

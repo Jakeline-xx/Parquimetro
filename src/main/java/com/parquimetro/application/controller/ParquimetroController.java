@@ -1,8 +1,8 @@
-package com.parquimetro.parquimetro.application.controller;
+package com.parquimetro.application.controller;
 
-import com.parquimetro.parquimetro.domain.entity.Parquimetro;
-import com.parquimetro.parquimetro.domain.service.ParquimetroService;
-import com.parquimetro.parquimetro.infra.repository.ParquimetroRepository;
+import com.parquimetro.infra.repository.ParquimetroRepository;
+import com.parquimetro.domain.entity.Parquimetro;
+import com.parquimetro.domain.service.ParquimetroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
